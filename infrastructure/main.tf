@@ -174,50 +174,50 @@ resource "azurerm_subnet_network_security_group_association" "nsg_assoc_app" {
   network_security_group_id = azurerm_network_security_group.nsg_app.id
 }
 
-# resource "azurerm_linux_virtual_machine" "vm_app" {
-#   name                = "vm-app"
-#   resource_group_name = azurerm_resource_group.rg.name
-#   location            = azurerm_resource_group.rg.location
-#   size                = var.vm_app_size
-#   admin_username      = var.admin_username
+resource "azurerm_linux_virtual_machine" "vm_app" {
+  name                = "vm-app"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  size                = var.vm_app_size
+  admin_username      = var.admin_username
 
-#   network_interface_ids = [
-#     azurerm_network_interface.nic_app.id,
-#   ]
+  network_interface_ids = [
+    azurerm_network_interface.nic_app.id,
+  ]
 
-#   admin_ssh_key {
-#     username   = var.admin_username
-#     public_key = var.ssh_public_key
-#   }
+  admin_ssh_key {
+    username   = var.admin_username
+    public_key = var.ssh_public_key
+  }
 
-#   os_disk {
-#     caching              = "ReadWrite"
-#     storage_account_type = "Standard_LRS"
-#   }
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
 
-#   source_image_reference {
-#     publisher = "Canonical"
-#     offer     = "0001-com-ubuntu-server-jammy"
-#     sku       = "22_04-lts"
-#     version   = "latest"
-#   }
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-jammy"
+    sku       = "22_04-lts"
+    version   = "latest"
+  }
 
-#   priority = "Spot"
-#   eviction_policy = "Deallocate"
-#   max_bid_price   = -1
+  priority = "Spot"
+  eviction_policy = "Deallocate"
+  max_bid_price   = -1
 
-#   tags = local.common_tags
-# }
+  tags = local.common_tags
+}
 
-# resource "azurerm_dev_test_global_vm_shutdown_schedule" "shutdown_app" {
-#   virtual_machine_id = azurerm_linux_virtual_machine.vm_app.id
-#   location           = azurerm_resource_group.rg.location
-#   enabled            = true
+resource "azurerm_dev_test_global_vm_shutdown_schedule" "shutdown_app" {
+  virtual_machine_id = azurerm_linux_virtual_machine.vm_app.id
+  location           = azurerm_resource_group.rg.location
+  enabled            = true
 
-#   daily_recurrence_time = "2200"
-#   timezone              = "SE Asia Standard Time"
+  daily_recurrence_time = "2200"
+  timezone              = "SE Asia Standard Time"
 
-#   notification_settings {
-#     enabled = false
-#   }
-# }
+  notification_settings {
+    enabled = false
+  }
+}
