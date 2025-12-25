@@ -1,0 +1,23 @@
+---
+- name: Set Up Gateway Layer
+  hosts: servers
+  become: true
+  gather_facts: false
+  vars_files:
+    - variables.yml
+
+  pre_tasks:
+    - name: Common Setup
+      ansible.builtin.import_tasks:
+        tasks/common_setup.yml
+
+  tasks:
+    - name: Install Squid
+      ansible.builtin.import_tasks:
+        tasks/squid_setup.yml
+
+  handlers:
+    - name: Restart Squid
+      service:
+        name: squid
+        state: restarted
