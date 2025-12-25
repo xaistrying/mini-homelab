@@ -5,6 +5,12 @@ terraform {
       version = "=4.1.0"
     }
   }
+  cloud {
+    organization = "xaistrying-org"
+    workspaces {
+      name = "mini-homelab"
+    }
+  }
 }
 
 provider "azurerm" {
