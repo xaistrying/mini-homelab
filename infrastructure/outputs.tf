@@ -14,6 +14,6 @@ output "app_private_ip" {
 }
 
 output "ssh_command" {
-  value = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${var.admin_username}@${azurerm_public_ip.public_ip.ip_address}"
-  description = "Use this commant to get into gateway"
+  description = "Command to connect to the gateway via SSH"
+  value       = "ssh ${var.admin_username}@${azurerm_public_ip.pip_gateway.ip_address}"
 }

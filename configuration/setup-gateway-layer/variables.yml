@@ -1,0 +1,7 @@
+---
+common_packages:
+  - curl
+  - wget
+  - telnet
+  - net-tools
+  - htop
