@@ -1,0 +1,17 @@
+---
+- name: Set Up Application Layer
+  hosts: servers
+  become: true
+  gather_facts: false
+  vars_files:
+    - variables.yml
+
+  pre_tasks:
+    - name: Common Setup
+      ansible.builtin.import_tasks:
+        tasks/common_setup.yml
+
+  tasks:
+    - name: Install K3s
+      ansible.builtin.import_tasks:
+        tasks/k3s_setup.yml
