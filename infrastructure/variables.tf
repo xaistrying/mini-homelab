@@ -32,5 +32,5 @@ variable "vm_gateway_size" {
 }
 
 variable "vm_app_size" {
-  default = "Standard_B1ms"
+  default = "Standard_B2as_v2"
 }
