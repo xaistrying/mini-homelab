@@ -32,6 +32,7 @@ resource "azurerm_public_ip" "pip_gateway" {
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   allocation_method   = "Static"
+  domain_name_label   = "xaistrying-gateway"
   tags                = local.common_tags
 }
 
@@ -143,7 +144,8 @@ resource "azurerm_network_interface" "nic_app" {
   ip_configuration {
     name                          = "internal"
     subnet_id                     = azurerm_subnet.snet_app.id
-    private_ip_address_allocation = "Dynamic"
+    private_ip_address_allocation = "Static"
+    private_ip_address            = "10.159.5.4"
   }
 
   tags = local.common_tags
@@ -202,7 +204,7 @@ resource "azurerm_linux_virtual_machine" "vm_app" {
     version   = "latest"
   }
 
-  priority = "Spot"
+  priority        = "Spot"
   eviction_policy = "Deallocate"
   max_bid_price   = -1
 
