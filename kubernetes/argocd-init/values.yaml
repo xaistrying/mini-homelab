@@ -33,7 +33,7 @@ apps:
           selfHeal: true
 
   workspaceLab:
-    enabled: true
+    enabled: false
     spec:
       project: addons
       source:
@@ -52,3 +52,13 @@ projects:
     enabled: true
   workspaceLab:
     enabled: true
+
+argo-cd:
+  namespaceOverride: argocd
+  server:
+    extraArgs:
+      - --insecure
+    ingress:
+      enabled: true
+      hosts:
+        - argocd-lab.net

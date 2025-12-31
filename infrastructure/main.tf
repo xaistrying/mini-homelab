@@ -105,9 +105,9 @@ resource "azurerm_linux_virtual_machine" "vm_gateway" {
     version   = "latest"
   }
 
-  priority        = "Spot"
-  eviction_policy = "Deallocate"
-  max_bid_price   = -1
+  # priority        = "Spot"
+  # eviction_policy = "Deallocate"
+  # max_bid_price   = -1
 
   tags = local.common_tags
 }
