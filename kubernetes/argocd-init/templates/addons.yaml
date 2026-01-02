@@ -5,8 +5,8 @@ kind: Application
 metadata:
   name: workspace-lab
   namespace: {{ $.Values.namespace | default "argocd" }}
-  finalizers:
-    - resources-finalizer.addons.argoproj.io
+  # finalizers:
+  #   - resources-finalizer.addons.argoproj.io
 {{- with .addons.spec }}
 spec:
   project: {{ .project | default "default" }}

@@ -10,7 +10,7 @@ spec:
       server: https://kubernetes.default.svc
   sourceRepos:
     - '*'
-  clusterResourceWhiteList:
+  clusterResourceWhitelist:
     - group: '*'
       kind: '*'
 {{- end }}
@@ -28,7 +28,7 @@ spec:
       server: https://kubernetes.default.svc
   sourceRepos:
     - '*'
-  clusterResourceWhiteList:
+  clusterResourceWhitelist:
     - group: '*'
       kind: '*'
 {{- end }}

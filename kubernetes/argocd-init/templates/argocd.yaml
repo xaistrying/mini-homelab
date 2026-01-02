@@ -5,8 +5,8 @@ kind: Application
 metadata:
   name: argocd
   namespace: {{ $.Values.namespace | default "argocd" }}
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
+  # finalizers:
+  #   - resources-finalizer.argocd.argoproj.io
 {{- with .argocd.spec }}
 spec:
   project: {{ .project | default "default" }}
