@@ -56,3 +56,9 @@
         path: /home/{{ ansible_user }}/.bashrc
         line: "export KUBECONFIG=~/.kube/config"
         create: yes
+
+    - name: Fetch k3s kubeconfig to local machine
+      ansible.builtin.fetch:
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: "{{ playbook_dir }}/../../kubernetes/kubeconfigs/lab.yaml"
+        flat: yes
