@@ -3,7 +3,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: workspace-lab
+  name: addons
   namespace: {{ $.Values.namespace | default "argocd" }}
 {{- with .addons.spec }}
 spec:
