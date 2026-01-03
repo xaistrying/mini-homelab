@@ -20,6 +20,9 @@ victoria-metrics-k8s-stack:
   alertmanager:
     enabled: false
 
+  vmalert:
+    enabled: false
+
   grafana:
     enabled: true
 
