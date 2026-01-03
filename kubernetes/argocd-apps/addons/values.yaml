@@ -1,0 +1,43 @@
+targetRevision: main
+namespace: argocd
+
+apps:
+  addons:
+    enabled: true
+    metadata:
+      name: loki-stack-lab
+    spec:
+      project: addons
+      source:
+        repoURL: https://github.com/xaistrying/mini-homelab.git
+        path: kubernetes/addons/loki
+        helm:
+          valueFiles:
+            - values.yaml
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: argocd
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+
+  victoriaMetrics:
+    enabled: true
+    metadata:
+      name: victoria-metrics-stack-lab
+    spec:
+      project: addons
+      source:
+        repoURL: https://github.com/xaistrying/mini-homelab.git
+        path: kubernetes/addons/victoria-metrics
+        helm:
+          valueFiles:
+            - values.yaml
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: argocd
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
