@@ -1,5 +1,39 @@
-argo-cd:
-  namespaceOverride: argocd
-  server:
-    extraArgs:
-      - --insecure
+targetRevision: main
+namespace: argocd
+
+projects:
+  addons:
+    enabled: true
+  workspaceLab:
+    enabled: true
+
+apps:
+  argocd:
+    enabled: true
+    spec:
+      project: addons
+      source:
+        repoURL: https://github.com/xaistrying/mini-homelab.git
+        path: kubernetes/argocd-init/argocd
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: argocd
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+
+  addons:
+    enabled: true
+    spec:
+      project: addons
+      source:
+        repoURL: https://github.com/xaistrying/mini-homelab.git
+        path: kubernetes/addons
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: argocd
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
