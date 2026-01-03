@@ -29,10 +29,15 @@ config:
 	cd $(CONF_DIR)/setup-application-layer && ansible-playbook -i $(INVENTORY_FILE) main.yml
 
 k8s:
-	cd ${K8S_DIR}/argocd-init && \
+	cd ${K8S_DIR}/argocd-init/ && \
 	helm dependency update && \
-	helm install argocd ./charts/argo-cd-9.0.6.tgz \
+	helm upgrade --install argocd argocd/ \
 		--create-namespace -n argocd \
+		--kubeconfig=$(ROOT_DIR)/$(K8S_DIR)/kubeconfigs/lab.yaml && \
+	kubectl wait --for=condition=established --timeout=60s \
+		crd/applications.argoproj.io \
+		--kubeconfig=$(ROOT_DIR)/$(K8S_DIR)/kubeconfigs/lab.yaml && \
+	helm template argocd-init . | kubectl apply -f - \
 		--kubeconfig=$(ROOT_DIR)/$(K8S_DIR)/kubeconfigs/lab.yaml
 
 clean:
