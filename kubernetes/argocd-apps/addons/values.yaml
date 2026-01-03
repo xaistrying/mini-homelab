@@ -25,7 +25,7 @@ apps:
   victoriaMetrics:
     enabled: true
     metadata:
-      name: victoria-metrics-stack-lab
+      name: vm-stack-lab
     spec:
       project: addons
       source:
