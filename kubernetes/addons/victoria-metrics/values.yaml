@@ -1,0 +1,19 @@
+victoria-metrics-k8s-stack:
+  grafana:
+    enabled: true
+
+    sidecar:
+      datasources:
+        enabled: true
+        createVMReplicasDatasources: false
+      dashboards:
+        enabled: true
+
+    datasources:
+      datasources.yaml:
+        apiVersion: 1
+        datasources:
+        - name: VictoriaMetrics
+          type: prometheus
+          url: http://vmsingle-victoria-metrics-k8s-stack:8428
+          isDefault: true
