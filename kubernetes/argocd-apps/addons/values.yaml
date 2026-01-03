@@ -2,7 +2,7 @@ targetRevision: main
 namespace: argocd
 
 apps:
-  addons:
+  loki:
     enabled: true
     metadata:
       name: loki-stack-lab
