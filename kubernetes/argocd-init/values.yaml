@@ -8,6 +8,20 @@ projects:
     enabled: true
 
 apps:
+  bootstrap:
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/xaistrying/mini-homelab.git
+        path: kubernetes/argocd-init
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: argocd
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+
   argocd:
     enabled: true
     spec:
@@ -37,22 +51,3 @@ apps:
         automated:
           prune: true
           selfHeal: true
-
-argo-cd:
-  namespaceOverride: argocd
-  configs:
-    params:
-      server.insecure: "true"
-  server:
-    extraArgs:
-      - --insecure
-    ingress:
-      enabled: true
-      ingressClassName: traefik
-
-      annotations:
-        traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        traefik.ingress.kubernetes.io/router.tls: "true"
-
-      hosts:
-        - argocd-lab.net
