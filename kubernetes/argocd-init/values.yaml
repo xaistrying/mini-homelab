@@ -11,7 +11,7 @@ apps:
   argocd:
     enabled: true
     spec:
-      project: addons
+      project: default
       source:
         repoURL: https://github.com/xaistrying/mini-homelab.git
         path: kubernetes/argocd-init/argocd
@@ -37,3 +37,22 @@ apps:
         automated:
           prune: true
           selfHeal: true
+
+argo-cd:
+  namespaceOverride: argocd
+  configs:
+    params:
+      server.insecure: "true"
+  server:
+    extraArgs:
+      - --insecure
+    ingress:
+      enabled: true
+      ingressClassName: traefik
+
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.tls: "true"
+
+      hosts:
+        - argocd-lab.net
