@@ -1,6 +1,25 @@
 victoria-metrics-k8s-stack:
   fullnameOverride: vm
 
+  prometheus-node-exporter:
+    enabled: true
+    grafanaDashboard:
+      enabled: false
+
+  kube-state-metrics:
+    enabled: true
+    grafanaDashboard:
+      enabled: false
+
+  victoria-metrics-operator:
+    enabled: true
+    admissionWebhooks:
+      enabled: false
+    createCRD: true
+
+  alertmanager:
+    enabled: false
+
   grafana:
     enabled: true
 
@@ -11,11 +30,23 @@ victoria-metrics-k8s-stack:
       dashboards:
         enabled: true
 
-    datasources:
-      datasources.yaml:
-        apiVersion: 1
-        datasources:
-        - name: VictoriaMetrics
-          type: prometheus
-          url: http://vmsingle-victoria-metrics-k8s-stack:8428
-          isDefault: true
+  defaultRules:
+    create: true
+    rules:
+      etcd: false
+      general: true
+      k8s: true
+      kubeApiserver: false
+      kubeApiserverAvailability: false
+      kubeApiserverSlos: false
+      kubelet: false
+      kubePrometheusGeneral: false
+      kubePrometheusNodeRecording: false
+      kubernetesApps: true
+      kubernetesResources: true
+      kubernetesStorage: false
+      kubernetesSystem: false
+      kubeScheduler: false
+      kubeStateMetrics: true
+      network: false
+      node: true
