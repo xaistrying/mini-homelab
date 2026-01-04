@@ -10,7 +10,7 @@ INVENTORY_FILE = inventory.ini
 
 # ------------------------- Main Commands -------------------------
 
-up: infra inventory config
+up: infra inventory config k8s
 	@echo "Lab is ready!"
 
 down: clean
@@ -38,7 +38,10 @@ k8s:
 		crd/applications.argoproj.io \
 		--kubeconfig=$(ROOT_DIR)/$(K8S_DIR)/kubeconfigs/lab.yaml && \
 	helm template argocd-init . | kubectl apply -f - \
-		--kubeconfig=$(ROOT_DIR)/$(K8S_DIR)/kubeconfigs/lab.yaml
+		--kubeconfig=$(ROOT_DIR)/$(K8S_DIR)/kubeconfigs/lab.yaml && \
+	kubectl get secret argocd-initial-admin-secret \
+		-o jsonpath="{.data.password}" -nargocd \
+		--kubeconfig=$(ROOT_DIR)/$(K8S_DIR)/kubeconfigs/lab.yaml | base64 -d
 
 clean:
 	cd $(INFRA_DIR) && terraform destroy -auto-approve
