@@ -16,7 +16,7 @@ apps:
             - values.yaml
       destination:
         server: https://kubernetes.default.svc
-        namespace: argocd
+        namespace: monitoring
       syncPolicy:
         automated:
           prune: true
@@ -36,7 +36,7 @@ apps:
             - values.yaml
       destination:
         server: https://kubernetes.default.svc
-        namespace: argocd
+        namespace: monitoring
       syncPolicy:
         automated:
           prune: true

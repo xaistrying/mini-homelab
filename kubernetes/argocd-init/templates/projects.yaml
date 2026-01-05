@@ -4,6 +4,7 @@ kind: AppProject
 metadata:
   name: addons
 spec:
+  description: Project for Add-on Tools
   destinations:
     - name: in-cluster
       namespace: '*'
@@ -22,6 +23,7 @@ kind: AppProject
 metadata:
   name: workspace-lab
 spec:
+  description: Project for Workspace Lab
   destinations:
     - name: in-cluster
       namespace: '*'
