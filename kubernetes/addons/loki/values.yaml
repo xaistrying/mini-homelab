@@ -1,6 +1,9 @@
 loki-stack:
   loki:
     enabled: true
+    datasource:
+      enabled: true
+      isDefault: false
 
   promtail:
     enabled: true
