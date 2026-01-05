@@ -8,6 +8,8 @@ SCRIPT_DIR = scripts
 
 INVENTORY_FILE = inventory.ini
 
+KUBECONFIG = $(ROOT_DIR)/$(K8S_DIR)/kubeconfigs/lab.yaml
+
 # ------------------------- Main Commands -------------------------
 
 up: infra inventory config k8s
@@ -33,17 +35,21 @@ k8s:
 	helm dependency update && \
 	helm upgrade --install argocd argocd/ \
 		--create-namespace -n argocd \
-		--kubeconfig=$(ROOT_DIR)/$(K8S_DIR)/kubeconfigs/lab.yaml && \
-	kubectl wait --for=condition=established --timeout=60s \
-		crd/applications.argoproj.io \
-		--kubeconfig=$(ROOT_DIR)/$(K8S_DIR)/kubeconfigs/lab.yaml && \
+		--kubeconfig=${KUBECONFIG}
+
+	kubectl wait --for=condition=available deployment/argocd-server \
+	  -n argocd --timeout=300s \
+	  --kubeconfig=$(KUBECONFIG)
+
 	helm template argocd-init . | kubectl apply -f - \
-		--kubeconfig=$(ROOT_DIR)/$(K8S_DIR)/kubeconfigs/lab.yaml && \
+		--kubeconfig=${KUBECONFIG}
+
 	kubectl get secret argocd-initial-admin-secret \
-		-o jsonpath="{.data.password}" -nargocd \
-		--kubeconfig=$(ROOT_DIR)/$(K8S_DIR)/kubeconfigs/lab.yaml | base64 -d
+		-nargocd -o jsonpath="{.data.password}" \
+		--kubeconfig=${KUBECONFIG} | base64 -d
 
 clean:
 	cd $(INFRA_DIR) && terraform destroy -auto-approve
 	cd ${CONF_DIR} && find . -type f -name "inventory.ini" -delete
+	cd ${CONF_DIR}/cleanup-local && ansible-playbook -i localhost, main.yml
 	cd ${K8S_DIR} && rm -rf kubeconfigs
