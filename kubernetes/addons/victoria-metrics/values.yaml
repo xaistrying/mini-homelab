@@ -30,6 +30,7 @@ victoria-metrics-k8s-stack:
       datasources:
         enabled: true
         createVMReplicasDatasources: false
+        defaultDatasourceEnabled: false
       dashboards:
         enabled: true
 
