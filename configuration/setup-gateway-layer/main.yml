@@ -16,8 +16,17 @@
       ansible.builtin.import_tasks:
         tasks/squid_setup.yml
 
+    - name: Install Nginx
+      ansible.builtin.import_tasks:
+        tasks/nginx_setup.yml
+
   handlers:
     - name: Restart Squid
-      service:
+      ansible.builtin.service:
         name: squid
+        state: restarted
+
+    - name: Restart Nginx
+      ansible.builtin.service:
+        name: nginx
         state: restarted

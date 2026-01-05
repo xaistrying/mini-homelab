@@ -1,0 +1,44 @@
+---
+- name: Nginx Setup
+  block:
+    - name: Install Nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+        update_cache: yes
+
+    - name: Create necessary directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - /etc/nginx/ssl
+        - /etc/nginx/vhosts
+
+    - name: Generate self-signed cert
+      ansible.builtin.command:
+        cmd: >
+          openssl req -x509 -nodes -days 365 -newkey rsa:2048
+          -keyout /etc/nginx/ssl/gateway.key
+          -out /etc/nginx/ssl/gateway.crt
+          -subj "/CN=nginx-gateway/O=xaistrying"
+        creates: /etc/nginx/ssl/gateway.crt
+
+    - name: Copy nginx configs
+      ansible.builtin.copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        mode: '0644'
+      loop:
+        - src: configs/nginx.conf
+          dest: /etc/nginx/nginx.conf
+        - src: configs/vhosts/
+          dest: /etc/nginx/vhosts/
+      notify: Restart Nginx
+
+    - name: Ensure Nginx is running and enabled
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: yes
