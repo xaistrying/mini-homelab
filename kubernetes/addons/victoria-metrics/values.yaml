@@ -23,6 +23,9 @@ victoria-metrics-k8s-stack:
   vmalert:
     enabled: false
 
+  vmsingle:
+    enabled: true
+
   grafana:
     enabled: true
 
@@ -34,16 +37,13 @@ victoria-metrics-k8s-stack:
       dashboards:
         enabled: true
 
-    datasources:
-      datasources.yaml:
-        apiVersion: 1
-        datasources:
-          - name: VictoriaMetrics
-            type: prometheus
-            url: http://vmsingle-vm:8429
-            access: proxy
-            isDefault: true
-            editable: true
+    additionalDataSources:
+      - name: VictoriaMetrics
+        type: prometheus
+        url: http://vmsingle-vm:8429
+        access: proxy
+        isDefault: true
+        editable: true
 
   defaultRules:
     create: true
