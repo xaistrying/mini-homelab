@@ -25,7 +25,7 @@ victoria-metrics-k8s-stack:
 
   grafana:
     enabled: true
-
+    defaultDashboardsEnabled: false
     sidecar:
       datasources:
         enabled: true
@@ -34,22 +34,4 @@ victoria-metrics-k8s-stack:
         enabled: true
 
   defaultRules:
-    create: true
-    rules:
-      etcd: false
-      general: true
-      k8s: true
-      kubeApiserver: false
-      kubeApiserverAvailability: false
-      kubeApiserverSlos: false
-      kubelet: false
-      kubePrometheusGeneral: false
-      kubePrometheusNodeRecording: false
-      kubernetesApps: true
-      kubernetesResources: true
-      kubernetesStorage: false
-      kubernetesSystem: false
-      kubeScheduler: false
-      kubeStateMetrics: true
-      network: false
-      node: true
+    create: false
