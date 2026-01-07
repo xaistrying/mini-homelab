@@ -1,9 +1,6 @@
 loki-stack:
   loki:
     enabled: true
-    datasource:
-      enabled: false
-      isDefault: false
 
   promtail:
     enabled: true
@@ -13,6 +10,9 @@ loki-stack:
 
   grafana:
     enabled: false
+    sidecar:
+      datasources:
+        enabled: false
 
   prometheus:
     enabled: false
