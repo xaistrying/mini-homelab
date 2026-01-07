@@ -1,0 +1,23 @@
+---
+- name: Manage Local /etc/hosts
+  hosts: localhost
+  connection: local
+  become: true
+  gather_facts: false
+  vars:
+    lab_domains:
+      - argocd.lab.net
+      - grafana.lab.net
+      - traefik.lab.net
+    gateway_public_ip: "{{ hostvars['vm_gateway']['ansible_host'] }}"
+
+  tasks:
+    - name: "Host - {{ 'Add' if state == 'present' else 'Remove' }} domains"
+      ansible.builtin.blockinfile:
+        path: /etc/hosts
+        marker: "# {mark} LAB.NET"
+        state: "{{ state | default('present') }}"
+        block: |
+          {% for domain in lab_domains %}
+          {{ gateway_public_ip }} {{ domain }}
+          {% endfor %}

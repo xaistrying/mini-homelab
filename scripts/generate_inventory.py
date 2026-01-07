@@ -7,6 +7,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 TF_DIR = os.path.join(SCRIPT_DIR, "../infrastructure")
 GW_DIR = os.path.join(SCRIPT_DIR, "../configuration/setup-gateway-layer")
 APP_DIR = os.path.join(SCRIPT_DIR, "../configuration/setup-application-layer")
+LOCAL_DIR = os.path.join(SCRIPT_DIR, "../configuration/setup-local")
 
 TPL_FILE = "inventory.ini.tpl"
 OUT_FILE = "inventory.ini"
@@ -60,8 +61,14 @@ def main():
         variables
     )
 
+    local_inventory = render_inventory(
+        os.path.join(LOCAL_DIR, TPL_FILE),
+        variables
+    )
+
     write_inventory(GW_DIR, gw_inventory)
     write_inventory(APP_DIR, app_inventory)
+    write_inventory(LOCAL_DIR, local_inventory)
 
     print("Inventory files generated successfully")
 
