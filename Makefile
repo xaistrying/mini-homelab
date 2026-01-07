@@ -27,23 +27,29 @@ inventory:
 	python3 $(SCRIPT_DIR)/generate_inventory.py
 
 config:
-	cd $(CONF_DIR)/setup-gateway-layer && ansible-playbook -i $(INVENTORY_FILE) main.yml
-	cd $(CONF_DIR)/setup-application-layer && ansible-playbook -i $(INVENTORY_FILE) main.yml
+# 	cd $(CONF_DIR)/setup-gateway-layer && ansible-playbook -i $(INVENTORY_FILE) main.yml
+# 	cd $(CONF_DIR)/setup-application-layer && ansible-playbook -i $(INVENTORY_FILE) main.yml
+	cd $(CONF_DIR)/setup-local && ansible-playbook -i $(INVENTORY_FILE) main.yml -e "state=present"
 
 k8s:
 	cd ${K8S_DIR}/argocd-init/ && \
 	helm dependency update && \
+	echo "Waiting for Traefik CRDs..." && \
+	until kubectl get crd ingressroutes.traefik.io --kubeconfig=${KUBECONFIG} 2>/dev/null; do \
+		echo "Traefik CRD not ready, waiting 5s..."; \
+		sleep 5; \
+	done && \
+	kubectl wait --for condition=established \
+		--timeout=60s crd/ingressroutes.traefik.io \
+		--kubeconfig=${KUBECONFIG} && \
 	helm upgrade --install argocd argocd/ \
 		--create-namespace -n argocd \
-		--kubeconfig=${KUBECONFIG}
-
+		--kubeconfig=${KUBECONFIG} && \
 	kubectl wait --for=condition=available deployment/argocd-server \
-	  -n argocd --timeout=300s \
-	  --kubeconfig=$(KUBECONFIG)
-
+		-n argocd --timeout=300s \
+		--kubeconfig=$(KUBECONFIG) && \
 	helm template argocd-init . | kubectl apply -f - \
 		--kubeconfig=${KUBECONFIG}
-
 	kubectl get secret argocd-initial-admin-secret \
 		-nargocd -o jsonpath="{.data.password}" \
 		--kubeconfig=${KUBECONFIG} | base64 -d
@@ -51,5 +57,5 @@ k8s:
 clean:
 	cd $(INFRA_DIR) && terraform destroy -auto-approve
 	cd ${CONF_DIR} && find . -type f -name "inventory.ini" -delete
-	cd ${CONF_DIR}/cleanup-local && ansible-playbook -i localhost, main.yml
+	cd $(CONF_DIR)/setup-local && ansible-playbook -i $(INVENTORY_FILE) main.yml -e "state=absent"
 	cd ${K8S_DIR} && rm -rf kubeconfigs
