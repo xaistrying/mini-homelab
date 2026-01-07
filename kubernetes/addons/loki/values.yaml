@@ -2,7 +2,7 @@ loki-stack:
   loki:
     enabled: true
     datasource:
-      enabled: true
+      enabled: false
       isDefault: false
 
   promtail:
