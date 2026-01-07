@@ -5,7 +5,7 @@ metadata:
   namespace: monitoring
 spec:
   entryPoints:
-    - web
+    - websecure
   routes:
     - match: Host(`grafana.lab.net`)
       kind: Rule
