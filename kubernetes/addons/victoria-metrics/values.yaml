@@ -44,6 +44,10 @@ victoria-metrics-k8s-stack:
         access: proxy
         isDefault: true
         editable: true
+      - name: Loki
+        type: loki
+        url: http://loki-stack-lab:3100
+        isDefault: false
 
   defaultRules:
     create: true
