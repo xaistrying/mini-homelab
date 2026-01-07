@@ -40,7 +40,7 @@ victoria-metrics-k8s-stack:
         datasources:
           - name: VictoriaMetrics
             type: prometheus
-            url: http://vm-vmsingle:8429
+            url: http://vmsingle-vm:8429
             access: proxy
             isDefault: true
             editable: true
