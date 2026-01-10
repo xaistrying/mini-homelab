@@ -35,9 +35,8 @@
     - name: Set server public key fact
       ansible.builtin.set_fact:
         server_publickey: "{{ server_publickey_content.stdout }}"
-      delegate_to: "{{ item }}"
+      delegate_to: localhost
       delegate_facts: true
-      loop: "{{ groups['servers'] }}"
 
 - name: Wireguard Client Setup
   hosts: localhost
@@ -76,8 +75,9 @@
     - name: Set client public key fact
       ansible.builtin.set_fact:
         client_publickey: "{{ client_publickey_content.stdout }}"
-      delegate_to: localhost
+      delegate_to: "{{ item }}"
       delegate_facts: true
+      loop: "{{ groups['servers'] }}"
 
 - name: Configure Server Wireguard
   hosts: servers
@@ -127,12 +127,6 @@
         group: root
         mode: '0600'
       notify: Restart wireguard
-
-    - name: Ensure client wireguard is running and enabled
-      ansible.builtin.service:
-        name: wg-quick@wg0
-        state: started
-        enabled: yes
 
   handlers:
     - name: Restart wireguard

@@ -8,6 +8,7 @@
     state: up
   tasks:
     - name: "{{ 'Start' if state == 'up' else 'Stop' }} VPN"
-      ansible.builtin.command:
-        cmd: "wg-quick {{ state }} wg0"
-      changed_when: true
+      ansible.builtin.service:
+        name: wg-quick@wg0
+        state: "{{ 'started' if state == 'up' else 'stopped' }}"
+        enabled: yes

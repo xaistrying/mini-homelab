@@ -44,9 +44,7 @@ k8s:
 	kubectl wait --for condition=established \
 		--timeout=60s crd/ingressroutes.traefik.io \
 		--kubeconfig=${KUBECONFIG} && \
-	helm upgrade --install argocd argocd/ \
-		--create-namespace -n argocd \
-		--kubeconfig=${KUBECONFIG} && \
+	helm upgrade --install argocd argocd/ -n argocd --kubeconfig=${KUBECONFIG} && \
 	kubectl wait --for=condition=available deployment/argocd-server \
 		-n argocd --timeout=300s \
 		--kubeconfig=$(KUBECONFIG) && \
@@ -59,6 +57,6 @@ k8s:
 clean:
 	cd $(INFRA_DIR) && terraform destroy -auto-approve
 	cd $(CONF_DIR)/setup-local && ansible-playbook -i $(INVENTORY_FILE) manage_hosts.yml -e "state=absent"
+	cd $(CONF_DIR)/setup-local && ansible-playbook -i $(INVENTORY_FILE) manage_wireguard.yml -e "state=down"
 	cd ${CONF_DIR} && find . -type f -name "inventory.ini" -delete
 	cd ${K8S_DIR} && rm -rf kubeconfigs
-	cd $(CONF_DIR)/setup-local && ansible-playbook -i $(INVENTORY_FILE) manage_wireguard.yml -e "state=down"
