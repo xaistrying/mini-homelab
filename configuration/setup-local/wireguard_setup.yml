@@ -1,0 +1,141 @@
+---
+- name: Wireguard Server Setup
+  hosts: servers
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Install wireguard package
+      ansible.builtin.apt:
+        name: wireguard
+        state: present
+        update_cache: yes
+
+    - name: Generate server private key
+      ansible.builtin.shell:
+        cmd: umask 077 && wg genkey | tee privatekey | wg pubkey > publickey
+        chdir: /etc/wireguard
+        creates: /etc/wireguard/publickey
+
+    - name: Get server private key
+      ansible.builtin.command:
+        cmd: cat /etc/wireguard/privatekey
+      register: server_privatekey_content
+      changed_when: False
+
+    - name: Set server private key fact
+      ansible.builtin.set_fact:
+        server_privatekey: "{{ server_privatekey_content.stdout }}"
+
+    - name: Get server public key
+      ansible.builtin.command:
+        cmd: cat /etc/wireguard/publickey
+      register: server_publickey_content
+      changed_when: False
+
+    - name: Set server public key fact
+      ansible.builtin.set_fact:
+        server_publickey: "{{ server_publickey_content.stdout }}"
+      delegate_to: "{{ item }}"
+      delegate_facts: true
+      loop: "{{ groups['servers'] }}"
+
+- name: Wireguard Client Setup
+  hosts: localhost
+  connection: local
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Install wireguard package
+      ansible.builtin.apt:
+        name: wireguard
+        state: present
+        update_cache: yes
+
+    - name: Generate private key
+      ansible.builtin.shell:
+        cmd: umask 077 && wg genkey | tee privatekey | wg pubkey > publickey
+        chdir: /etc/wireguard
+        creates: /etc/wireguard/publickey
+
+    - name: Get client private key
+      ansible.builtin.command:
+        cmd: cat /etc/wireguard/privatekey
+      register: client_privatekey_content
+      changed_when: False
+
+    - name: Set client private key fact
+      ansible.builtin.set_fact:
+        client_privatekey: "{{ client_privatekey_content.stdout }}"
+
+    - name: Get client public key
+      ansible.builtin.command:
+        cmd: cat /etc/wireguard/publickey
+      register: client_publickey_content
+      changed_when: False
+
+    - name: Set client public key fact
+      ansible.builtin.set_fact:
+        client_publickey: "{{ client_publickey_content.stdout }}"
+      delegate_to: localhost
+      delegate_facts: true
+
+- name: Configure Server Wireguard
+  hosts: servers
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Create wireguard config
+      ansible.builtin.template:
+        src: configs/server-wg0.conf.j2
+        dest: /etc/wireguard/wg0.conf
+        owner: root
+        group: root
+        mode: '0600'
+      notify: Restart wireguard
+
+    - name: Enable and persist ip forwarding
+      ansible.posix.sysctl:
+        name: net.ipv4.ip_forward
+        value: "1"
+        state: present
+        sysctl_set: yes
+        reload: yes
+
+    - name: Ensure server wireguard is running and enabled
+      ansible.builtin.service:
+        name: wg-quick@wg0
+        state: started
+        enabled: yes
+
+  handlers:
+    - name: Restart wireguard
+      ansible.builtin.service:
+        name: wg-quick@wg0
+        state: restarted
+
+- name: Configure Client Wireguard
+  hosts: localhost
+  connection: local
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Create wireguard config
+      ansible.builtin.template:
+        src: configs/client-wg0.conf.j2
+        dest: /etc/wireguard/wg0.conf
+        owner: root
+        group: root
+        mode: '0600'
+      notify: Restart wireguard
+
+    - name: Ensure client wireguard is running and enabled
+      ansible.builtin.service:
+        name: wg-quick@wg0
+        state: started
+        enabled: yes
+
+  handlers:
+    - name: Restart wireguard
+      ansible.builtin.service:
+        name: wg-quick@wg0
+        state: restarted

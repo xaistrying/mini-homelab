@@ -1,0 +1,26 @@
+# {{ ansible_managed }}
+
+[Interface]
+# Client IP in VPN subnet
+Address = 10.8.0.2/24
+
+PrivateKey = {{ client_privatekey }}
+
+# Optional
+DNS = 8.8.8.8
+
+[Peer]
+# Server's public key
+PublicKey = {{ server_publickey }}
+
+# Gateway VM's public IP and port
+Endpoint = {{ hostvars['server'].ansible_host }}:51820
+
+# Routes to send through VPN:
+# - 10.8.0.0/24: WireGuard subnet (peer communication)
+# - 10.159.0.0/16: Azure VNet (to access vm_app and other VMs)
+# This is SPLIT TUNNEL - only Azure traffic uses VPN
+AllowedIPs = 10.8.0.0/24, 10.159.0.0/16
+
+# Keep NAT mapping alive
+PersistentKeepalive = 25

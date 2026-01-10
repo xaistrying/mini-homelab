@@ -1,0 +1,21 @@
+# {{ ansible_managed }}
+
+[Interface]
+# Server IP in VPN subnet
+Address = 10.8.0.1/24
+
+# UDP port to listen on
+ListenPort = 51820
+
+# Server's private key
+PrivateKey = {{ server_privatekey }}
+
+[Peer]
+# Client's public key
+PublicKey = {{ client_publickey }}
+
+# Only allow traffic from client's VPN IP
+AllowedIPs = 10.8.0.2/32
+
+# Keep connection alive
+PersistentKeepalive = 25

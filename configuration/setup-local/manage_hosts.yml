@@ -9,7 +9,7 @@
       - argocd.lab.net
       - grafana.lab.net
       - traefik.lab.net
-    gateway_public_ip: "{{ hostvars['vm_gateway']['ansible_host'] }}"
+    gateway_public_ip: "{{ hostvars['server']['ansible_host'] }}"
 
   tasks:
     - name: "Host - {{ 'Add' if state == 'present' else 'Remove' }} domains"

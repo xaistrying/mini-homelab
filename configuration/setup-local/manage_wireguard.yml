@@ -1,0 +1,13 @@
+---
+- name: "{{ 'Start' if state == 'up' else 'Stop' }} VPN on Client"
+  hosts: localhost
+  connection: local
+  become: true
+  gather_facts: false
+  vars:
+    state: up
+  tasks:
+    - name: "{{ 'Start' if state == 'up' else 'Stop' }} VPN"
+      ansible.builtin.command:
+        cmd: "wg-quick {{ state }} wg0"
+      changed_when: true
