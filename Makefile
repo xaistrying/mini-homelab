@@ -44,7 +44,7 @@ k8s:
 	kubectl wait --for condition=established \
 		--timeout=60s crd/ingressroutes.traefik.io \
 		--kubeconfig=${KUBECONFIG} && \
-	helm upgrade --install argocd argocd/ -n argocd --kubeconfig=${KUBECONFIG} && \
+	helm upgrade --install argocd argocd/ --create-namespace -n argocd --kubeconfig=${KUBECONFIG} && \
 	kubectl wait --for=condition=available deployment/argocd-server \
 		-n argocd --timeout=300s \
 		--kubeconfig=$(KUBECONFIG) && \

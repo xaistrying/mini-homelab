@@ -62,3 +62,11 @@
         src: /etc/rancher/k3s/k3s.yaml
         dest: "{{ playbook_dir }}/../../kubernetes/kubeconfigs/lab.yaml"
         flat: yes
+
+    - name: Replace k3s server address in kubeconfig
+      ansible.builtin.replace:
+        path: "{{ playbook_dir }}/../../kubernetes/kubeconfigs/lab.yaml"
+        regexp: 'server:\s+https://127\.0\.0\.1:6443'
+        replace: 'server: https://{{ ansible_host }}:6443'
+      delegate_to: localhost
+      become: false
