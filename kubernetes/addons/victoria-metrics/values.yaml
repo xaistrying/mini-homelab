@@ -1,37 +1,49 @@
 victoria-metrics-k8s-stack:
   fullnameOverride: vm
 
-  prometheus-node-exporter:
-    enabled: true
-    grafanaDashboard:
-      enabled: false
+  # ---------- Grafana and Dashboards ---------
+  grafana:
+    enabled: false
 
   kube-state-metrics:
     enabled: true
     grafanaDashboard:
       enabled: false
 
+  prometheus-node-exporter:
+    enabled: true
+    grafanaDashboard:
+      enabled: false
+
   victoria-metrics-operator:
     enabled: true
+    createCRD: true
     admissionWebhooks:
       enabled: false
-    createCRD: true
+
+  # ---------- Core Victoria Metrics ----------
+  vmsingle:
+    enabled: true
+    retentionPeriod: 7d
+    resources:
+      requests:
+        memory: 512Mi
+        cpu: 200m
+      limits:
+        memory: 1Gi
+
+  vmagent:
+    enabled: true
+    extraArgs:
+      promscrape.maxScrapeSize: "64MB"
+
+  # ---------- Alerting -----------------------
+  vmalert:
+    enabled: false
 
   alertmanager:
     enabled: false
 
-  vmalert:
-    enabled: false
-
-  grafana:
-    enabled: true
-    defaultDashboardsEnabled: false
-    sidecar:
-      datasources:
-        enabled: true
-        createVMReplicasDatasources: false
-      dashboards:
-        enabled: true
-
+  # ---------- Prometheus Rules ---------------
   defaultRules:
     create: false
