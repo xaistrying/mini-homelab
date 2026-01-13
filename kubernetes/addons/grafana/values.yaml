@@ -31,6 +31,22 @@ grafana:
 
   dashboards: {}
 
+  initChownData:
+    enabled: false
+
+  podSecurityContext:
+    fsGroup: 472
+    runAsUser: 472
+    runAsGroup: 472
+    fsGroupChangePolicy: "OnRootMismatch"
+
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: false
+
   resources:
     requests:
       cpu: 100m
