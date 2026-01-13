@@ -2,6 +2,26 @@ targetRevision: main
 namespace: argocd
 
 apps:
+  grafana:
+    enabled: true
+    metadata:
+      name: grafana-lab
+    spec:
+      project: addons
+      source:
+        repoURL: https://github.com/xaistrying/mini-homelab.git
+        path: kubernetes/addons/grafana
+        helm:
+          valueFiles:
+            - values.yaml
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: monitoring
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+
   loki:
     enabled: true
     metadata:
