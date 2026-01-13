@@ -1,1 +1,40 @@
 grafana:
+  persistence:
+    enabled: true
+    size: 2Gi
+    storageClassName: local-path
+
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: VictoriaMetrics
+          type: prometheus
+          uid: victoria-metrics
+          url: http://vmsingle-vm.monitoring:8429
+          access: proxy
+          isDefault: true
+          editable: true
+          jsonData:
+            timeInterval: 30s
+            httpMethod: POST
+
+        - name: Loki
+          type: loki
+          uid: loki
+          url: http://loki-stack-lab.monitoring:3100
+          access: proxy
+          isDefault: false
+          editable: true
+          jsonData:
+            maxLines: 1000
+
+  dashboards: {}
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
