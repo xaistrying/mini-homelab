@@ -1,4 +1,7 @@
 grafana:
+  adminUser: admin
+  adminPassword: strongpassword
+
   persistence:
     enabled: true
     size: 2Gi
