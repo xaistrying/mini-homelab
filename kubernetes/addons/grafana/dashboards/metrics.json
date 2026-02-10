@@ -23,7 +23,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${datasources}"
+        "uid": "${datasource}"
       },
       "description": "Overall CPU busy percentage (averaged across all cores)",
       "fieldConfig": {
@@ -93,7 +93,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasources}"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -111,7 +111,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${datasources}"
+        "uid": "${datasource}"
       },
       "description": "Real RAM usage excluding cache and reclaimable memory",
       "fieldConfig": {
@@ -171,7 +171,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasources}"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -695,7 +695,7 @@
         },
         "datasource": {
           "type": "prometheus",
-          "uid": "${datasources}"
+          "uid": "${datasource}"
         },
         "definition": "label_values(node_uname_info,job)",
         "label": "Job",
@@ -718,7 +718,7 @@
         },
         "datasource": {
           "type": "prometheus",
-          "uid": "${datasources}"
+          "uid": "${datasource}"
         },
         "definition": "label_values(node_uname_info{job=\"$job\"},nodename)",
         "label": "Nodename",
