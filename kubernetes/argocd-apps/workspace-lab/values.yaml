@@ -1,0 +1,23 @@
+targetRevision: main
+namespace: argocd
+
+apps:
+  podinfo:
+    enabled: true
+    metadata:
+      name: podinfo-lab
+    spec:
+      project: workspace-lab
+      source:
+        repoURL: https://github.com/xaistrying/mini-homelab.git
+        path: kubernetes/workspace-lab/podinfo
+        helm:
+          valueFiles:
+            - values.yaml
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: lab
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true

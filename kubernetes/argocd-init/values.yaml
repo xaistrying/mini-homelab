@@ -51,3 +51,18 @@ apps:
         automated:
           prune: true
           selfHeal: true
+
+  workspaceLab:
+    enabled: true
+    spec:
+      project: workspaceLab
+      source:
+        repoURL: https://github.com/xaistrying/mini-homelab.git
+        path: kubernetes/argocd-apps/workspace-lab
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: lab
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true

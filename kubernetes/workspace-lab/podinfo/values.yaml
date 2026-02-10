@@ -1,0 +1,87 @@
+# =============================================================================
+# PODINFO — Microservice mẫu cho Observability Learning
+# =============================================================================
+#
+# Podinfo là gì?
+#   Một Go microservice nhỏ được thiết kế ĐẶC BIỆT để test trên Kubernetes.
+#   Nó expose /metrics (Prometheus format), có health checks, và có các
+#   endpoint giả lập lỗi/delay — lý tưởng để học observability.
+#
+# Endpoints quan trọng:
+#   GET  /              → trả về pod info (hostname, version, etc.)
+#   GET  /healthz       → health check (dùng cho liveness probe)
+#   GET  /readyz        → readiness check (dùng cho readiness probe)
+#   GET  /metrics       → Prometheus metrics (VMAgent sẽ scrape endpoint này)
+#   GET  /delay/{secs}  → simulate slow response (ví dụ: /delay/5 → đợi 5 giây)
+#   GET  /status/{code} → simulate HTTP error (ví dụ: /status/500 → trả 500)
+#   POST /panic         → crash container ngay lập tức → K8s sẽ restart pod
+#   GET  /env           → xem environment variables
+#   POST /store         → simulate data write
+#   GET  /store/{hash}  → simulate data read
+#
+# Metrics mà Podinfo expose (trên /metrics):
+#   http_request_duration_seconds  → histogram, đo thời gian xử lý request
+#   http_requests_total            → counter, đếm tổng số requests
+#   Cả hai đều có labels: method, path, status → filter trên Grafana
+#
+# =============================================================================
+
+podinfo:
+  # ---------------------------------------------------------------------------
+  # Replicas
+  # ---------------------------------------------------------------------------
+  # Chạy 2 replicas để:
+  #   1. Chaos Mesh có thể kill 1 pod mà service vẫn available
+  #   2. Quan sát load balancing giữa 2 pods trên Grafana
+  #   3. Simulate production scenario (luôn có ≥2 replicas)
+  replicaCount: 2
+
+  # ---------------------------------------------------------------------------
+  # Resources — giới hạn tài nguyên cho homelab
+  # ---------------------------------------------------------------------------
+  # Podinfo rất nhẹ (~10MB RAM idle), nhưng khi bị k6 stress test
+  # hoặc Chaos Mesh CPU stress, nó sẽ dùng nhiều hơn.
+  #
+  # requests = guaranteed resources (K8s scheduler dùng số này để đặt pod)
+  # limits   = maximum resources (vượt limit → OOMKill hoặc CPU throttle)
+  resources:
+    requests:
+      cpu: 50m        # 50 milliCPU = 5% of 1 core
+      memory: 32Mi    # 32 MiB — đủ cho idle + light traffic
+    limits:
+      cpu: 200m       # max 20% of 1 core
+      memory: 128Mi   # vượt → OOMKill → pod restart → bạn sẽ thấy trên Grafana
+
+  # ---------------------------------------------------------------------------
+  # Health checks (Probes)
+  # ---------------------------------------------------------------------------
+  # Kubernetes liên tục check health của pod qua 2 probe:
+  #
+  # Liveness Probe (/healthz):
+  #   "Pod còn sống không?" → Nếu fail → K8s RESTART pod
+  #   Chaos Mesh sẽ inject failure vào đây để trigger restart
+  #
+  # Readiness Probe (/readyz):
+  #   "Pod sẵn sàng nhận traffic không?" → Nếu fail → K8s BỎ pod ra khỏi Service
+  #   (pod vẫn chạy, chỉ không nhận request mới)
+  #
+  # Khi dùng Chaos Mesh:
+  #   - Pod kill → liveness fail → restart → quan sát restart count trên Grafana
+  #   - Network delay → readiness timeout → pod bị remove khỏi endpoints
+  #     → error rate tăng vì traffic dồn vào pod còn lại
+
+  # ---------------------------------------------------------------------------
+  # Service
+  # ---------------------------------------------------------------------------
+  # ClusterIP service — chỉ access được từ trong cluster.
+  # k6 sẽ gọi vào service này: http://podinfo.lab:9898
+  service:
+    enabled: true
+
+  # ---------------------------------------------------------------------------
+  # Ingress — mặc định tắt
+  # ---------------------------------------------------------------------------
+  # Podinfo chỉ cần access nội bộ cho k6.
+  # Bật nếu bạn muốn truy cập từ browser.
+  ingress:
+    enabled: false
