@@ -32,14 +32,16 @@ grafana:
           jsonData:
             maxLines: 1000
 
-  dashboards:
-    custom:
-      metrics:
-        json: |
-          {{ .Files.Get "dashboards/metrics.json" | nindent 10 }}
-      logging:
-        json: |
-          {{ .Files.Get "dashboards/logging.json" | nindent 10 }}
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      labelValue: "1"
+      searchNamespace: ALL
+    datasources:
+      enabled: false
+
+  dashboards: {}
 
   initChownData:
     enabled: false
