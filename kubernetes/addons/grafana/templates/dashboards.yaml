@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-lab-custom-dashboards
+  namespace: {{ .Release.Namespace }}
+  labels:
+    dashboard-provider: custom
+    grafana_dashboard: "1"
+data:
+  metrics.json: |-
+{{ .Files.Get "dashboards/metrics.json" | indent 4 }}
+
+  logging.json: |-
+{{ .Files.Get "dashboards/logging.json" | indent 4 }}
+
+  podinfo-observability.json: |-
+{{ .Files.Get "dashboards/podinfo-observability.json" | indent 4 }}
