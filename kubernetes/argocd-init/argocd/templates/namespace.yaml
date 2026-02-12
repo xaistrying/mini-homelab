@@ -4,3 +4,21 @@ metadata:
   name: monitoring
   annotations:
     argocd.argoproj.io/sync-options: Prune=false
+---
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: lab
+  labels:
+    purpose: observability-lab
+    # Allow Chaos Mesh to inject failures into this namespace
+    chaos-mesh.org/inject: "true"
+---
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: loadtest
+  labels:
+    purpose: load-testing
