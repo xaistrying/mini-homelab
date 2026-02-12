@@ -1,87 +1,88 @@
 # =============================================================================
-# PODINFO — Microservice mẫu cho Observability Learning
+# PODINFO — Reference Microservice for Observability & Chaos Engineering
 # =============================================================================
 #
-# Podinfo là gì?
-#   Một Go microservice nhỏ được thiết kế ĐẶC BIỆT để test trên Kubernetes.
-#   Nó expose /metrics (Prometheus format), có health checks, và có các
-#   endpoint giả lập lỗi/delay — lý tưởng để học observability.
+# What is Podinfo?
+#   A small Go microservice specifically designed for Kubernetes testing.
+#   It exposes /metrics in Prometheus format, includes built-in health checks,
+#   and features "fault injection" endpoints—ideal for learning observability,
+#   monitoring, and resilience patterns.
 #
-# Endpoints quan trọng:
-#   GET  /              → trả về pod info (hostname, version, etc.)
-#   GET  /healthz       → health check (dùng cho liveness probe)
-#   GET  /readyz        → readiness check (dùng cho readiness probe)
-#   GET  /metrics       → Prometheus metrics (VMAgent sẽ scrape endpoint này)
-#   GET  /delay/{secs}  → simulate slow response (ví dụ: /delay/5 → đợi 5 giây)
-#   GET  /status/{code} → simulate HTTP error (ví dụ: /status/500 → trả 500)
-#   POST /panic         → crash container ngay lập tức → K8s sẽ restart pod
-#   GET  /env           → xem environment variables
+# Key Endpoints:
+#   GET  /              → returns pod info (hostname, version, etc.)
+#   GET  /healthz       → health check (use for liveness probe)
+#   GET  /readyz        → readiness check (use for readiness probe)
+#   GET  /metrics       → prometheus metrics (to be scraped by VMAgent/Prometheus)
+#   GET  /delay/{secs}  → simulate slow response (latency) (e.g. /delay/5 → wait 5 seconds)
+#   GET  /status/{code} → simulate HTTP error (e.g. /status/500 → return 500)
+#   POST /panic         → crash container immediately → test K8s self-healing
+#   GET  /env           → returns environment variables
 #   POST /store         → simulate data write
 #   GET  /store/{hash}  → simulate data read
 #
-# Metrics mà Podinfo expose (trên /metrics):
-#   http_request_duration_seconds  → histogram, đo thời gian xử lý request
-#   http_requests_total            → counter, đếm tổng số requests
-#   Cả hai đều có labels: method, path, status → filter trên Grafana
+# Metrics exposed by Podinfo (on /metrics):
+#   http_request_duration_seconds  → histogram, measures request processing time
+#   http_requests_total            → counter, counts total number of requests
+#   Both have labels: method, path, status → filter on Grafana
 #
 # =============================================================================
 
 podinfo:
   # ---------------------------------------------------------------------------
-  # Replicas
+  # Replication Strategy
   # ---------------------------------------------------------------------------
-  # Chạy 2 replicas để:
-  #   1. Chaos Mesh có thể kill 1 pod mà service vẫn available
-  #   2. Quan sát load balancing giữa 2 pods trên Grafana
-  #   3. Simulate production scenario (luôn có ≥2 replicas)
+  # Running 2 replicas serves these purposes:
+  #   1. Chaos Mesh can kill 1 pod while the service remains available
+  #   2. Observing load balancing between 2 pods on Grafana
+  #   3. Simulate production scenario (always have more than 2 replicas)
   replicaCount: 2
 
   # ---------------------------------------------------------------------------
-  # Resources — giới hạn tài nguyên cho homelab
+  # Resources
   # ---------------------------------------------------------------------------
-  # Podinfo rất nhẹ (~10MB RAM idle), nhưng khi bị k6 stress test
-  # hoặc Chaos Mesh CPU stress, nó sẽ dùng nhiều hơn.
+  # Podinfo is lightweight (~10MB RAM idle). However, resources will spike 
+  # during k6 stress tests or Chaos Mesh CPU-stress experiments.
   #
-  # requests = guaranteed resources (K8s scheduler dùng số này để đặt pod)
-  # limits   = maximum resources (vượt limit → OOMKill hoặc CPU throttle)
+  # requests = guaranteed resources (K8s scheduler uses this to schedule pod)
+  # limits   = maximum resources (exceeding limit → OOMKill or CPU throttle)
   resources:
     requests:
       cpu: 50m        # 50 milliCPU = 5% of 1 core
-      memory: 32Mi    # 32 MiB — đủ cho idle + light traffic
+      memory: 32Mi    # 32 MiB — enough for idle + light traffic
     limits:
       cpu: 200m       # max 20% of 1 core
-      memory: 128Mi   # vượt → OOMKill → pod restart → bạn sẽ thấy trên Grafana
+      memory: 128Mi   # exceeds → OOMKill → pod restart → you'll see on Grafana
 
   # ---------------------------------------------------------------------------
   # Health checks (Probes)
   # ---------------------------------------------------------------------------
-  # Kubernetes liên tục check health của pod qua 2 probe:
+  # Kubernetes continuously checks health of pod via 2 probes:
   #
   # Liveness Probe (/healthz):
-  #   "Pod còn sống không?" → Nếu fail → K8s RESTART pod
-  #   Chaos Mesh sẽ inject failure vào đây để trigger restart
+  #   Logic: "Is the container stuck?" → If failure is detected → K8s RESTARTS pod.
+  #   Testing: Use Chaos Mesh to inject faults here to trigger and monitor restarts.
   #
   # Readiness Probe (/readyz):
-  #   "Pod sẵn sàng nhận traffic không?" → Nếu fail → K8s BỎ pod ra khỏi Service
-  #   (pod vẫn chạy, chỉ không nhận request mới)
+  #   Logic: "Is the container ready to receive traffic?" → If failure is detected → K8s removes pod from Service.
+  #   Testing: Use Chaos Mesh to inject faults here to trigger and monitor pod removal.
   #
-  # Khi dùng Chaos Mesh:
-  #   - Pod kill → liveness fail → restart → quan sát restart count trên Grafana
-  #   - Network delay → readiness timeout → pod bị remove khỏi endpoints
-  #     → error rate tăng vì traffic dồn vào pod còn lại
+  # When using Chaos Mesh:
+  #   - Pod kill → liveness fail → restart → you'll see restart count on Grafana
+  #   - Network delay → readiness timeout → pod removed from endpoints
+  #     → error rate increases as traffic flows to remaining pod
 
   # ---------------------------------------------------------------------------
   # Service
   # ---------------------------------------------------------------------------
-  # ClusterIP service — chỉ access được từ trong cluster.
-  # k6 sẽ gọi vào service này: http://podinfo.lab:9898
+  # ClusterIP service — only accessible from within the cluster.
+  # k6 will call into this service: http://podinfo.lab:9898
   service:
     enabled: true
 
   # ---------------------------------------------------------------------------
-  # Ingress — mặc định tắt
+  # Ingress — default off
   # ---------------------------------------------------------------------------
-  # Podinfo chỉ cần access nội bộ cho k6.
-  # Bật nếu bạn muốn truy cập từ browser.
+  # Podinfo only needs access from within the cluster.
+  # Enable if you want to access from browser.
   ingress:
     enabled: false
