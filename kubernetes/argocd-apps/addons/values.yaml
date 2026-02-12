@@ -63,3 +63,25 @@ apps:
           selfHeal: true
         syncOptions:
           - ServerSideApply=true
+
+  chaosMesh:
+    enabled: true
+    metadata:
+      name: chaos-mesh-lab
+    spec:
+      project: addons
+      source:
+        repoURL: https://github.com/xaistrying/mini-homelab.git
+        path: kubernetes/addons/chaos-mesh
+        helm:
+          valueFiles:
+            - values.yaml
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: chaos-mesh
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - ServerSideApply=true
