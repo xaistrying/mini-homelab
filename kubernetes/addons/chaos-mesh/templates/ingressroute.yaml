@@ -7,8 +7,8 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`chaos-mesh.lab.net`)
+    - match: Host(`chaosmesh.lab.net`)
       kind: Rule
       services:
-        - name: chaos-mesh-dashboard
+        - name: chaos-dashboard
           port: 2333
