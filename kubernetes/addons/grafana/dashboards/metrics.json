@@ -105,7 +105,7 @@
           "step": 240
         }
       ],
-      "title": "CPU UsedUsed",
+      "title": "CPU Used",
       "type": "gauge"
     },
     {

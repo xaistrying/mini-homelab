@@ -75,7 +75,7 @@ podinfo:
   # Service
   # ---------------------------------------------------------------------------
   # ClusterIP service — only accessible from within the cluster.
-  # k6 will call into this service: http://podinfo.lab:9898
+  # k6 will call into this service: http://podinfo-lab.lab:9898 (Format: <service-name>.<namespace>:<port>)
   service:
     enabled: true
 
