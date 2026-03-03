@@ -55,7 +55,7 @@ apps:
   workspaceLab:
     enabled: true
     spec:
-      project: workspaceLab
+      project: workspace-lab
       source:
         repoURL: https://github.com/xaistrying/mini-homelab.git
         path: kubernetes/argocd-apps/workspace-lab
