@@ -9,6 +9,7 @@
       - argocd.lab.net
       - grafana.lab.net
       - traefik.lab.net
+      - chaosmesh.lab.net
     gateway_public_ip: "{{ hostvars['server']['ansible_host'] }}"
 
   tasks:
