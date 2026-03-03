@@ -1,0 +1,57 @@
+chaos-mesh:
+  # ---------------------------------------------------------------------------
+  # Controller Manager — brain of Chaos Mesh
+  # ---------------------------------------------------------------------------
+  controllerManager:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+
+    # IMPORTANT: Only allow injection into namespaces with specific labels
+    # Only namespace "lab" has label chaos-mesh.org/inject: "true" → allowed
+    # Other namespaces → NO label → safe
+    env:
+      FILTER_NAMESPACE_SELECTOR: "chaos-mesh.org/inject=true"
+
+  # ---------------------------------------------------------------------------
+  # Chaos Daemon — agent running on each node
+  # ---------------------------------------------------------------------------
+  # DaemonSet = 1 pod per node, need high privilege to manipulate containers
+  chaosDaemon:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+    # Runtime: containerd (K3s default)
+    runtime: containerd
+    socketPath: /run/containerd/containerd.sock
+
+  # ---------------------------------------------------------------------------
+  # Dashboard — Web UI for creating and managing experiments
+  # ---------------------------------------------------------------------------
+  dashboard:
+    # Enable dashboard to have a visual UI
+    enabled: true
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 200m
+        memory: 128Mi
+
+    # Security: no need login for homelab (DO NOT do this on production)
+    securityMode: false
+
+  # ---------------------------------------------------------------------------
+  # DNS Chaos — turn off to save resource on homelab
+  # ---------------------------------------------------------------------------
+  dnsServer:
+    create: false

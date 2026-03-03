@@ -1,0 +1,7 @@
+apiVersion: v2
+name: chaos-mesh
+version: 2.7.1
+dependencies:
+  - name: chaos-mesh
+    version: 2.7.1
+    repository: https://charts.chaos-mesh.org
