@@ -31,7 +31,8 @@ chaos-mesh:
         memory: 256Mi
     # Runtime: containerd (K3s default)
     runtime: containerd
-    socketPath: /run/containerd/containerd.sock
+    socketPath: /run/k3s/containerd/containerd.sock
+    privileged: true
 
   # ---------------------------------------------------------------------------
   # Dashboard — Web UI for creating and managing experiments
