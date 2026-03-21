@@ -1,0 +1,16 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMPodScrape
+metadata:
+  name: podinfo-scrape
+  namespace: {{ .Release.Namespace }}
+spec:
+  podMetricsEndpoints:
+    - port: http
+      path: /metrics
+      scheme: http
+  namespaceSelector:
+    matchNames:
+      - lab
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: podinfo-lab
