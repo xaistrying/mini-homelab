@@ -12,6 +12,3 @@ data:
 
   logging.json: |-
 {{ .Files.Get "dashboards/logging.json" | indent 4 }}
-
-  podinfo-observability.json: |-
-{{ .Files.Get "dashboards/podinfo-observability.json" | indent 4 }}
