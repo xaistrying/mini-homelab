@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: k6-traffic-sim
+  namespace: {{ .Release.Namespace }}
+spec:
+  schedule: {{ .Values.k6.schedule | quote }}
+  concurrencyPolicy: Forbid           # Don't overlap runs
+  successfulJobsHistoryLimit: 3       # Keep last 3 completed jobs
+  failedJobsHistoryLimit: 3           # Keep last 3 failed jobs
+  jobTemplate:
+    spec:
+      backoffLimit: 1                 # Retry once on failure
+      activeDeadlineSeconds: 420      # Kill job after 7 minutes (5m run + 2m buffer)
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: k6
+              image: "{{ .Values.k6.image.repository }}:{{ .Values.k6.image.tag }}"
+              command:
+                - k6
+                - run
+                - /scripts/script.js
+              env:
+                - name: K6_TARGET_URL
+                  value: {{ .Values.k6.target.url | quote }}
+                - name: K6_VUS
+                  value: {{ .Values.k6.vus | quote }}
+                - name: K6_DURATION
+                  value: {{ .Values.k6.duration | quote }}
+              resources:
+                requests:
+                  cpu: {{ .Values.k6.resources.requests.cpu }}
+                  memory: {{ .Values.k6.resources.requests.memory }}
+                limits:
+                  cpu: {{ .Values.k6.resources.limits.cpu }}
+                  memory: {{ .Values.k6.resources.limits.memory }}
+              volumeMounts:
+                - name: k6-scripts
+                  mountPath: /scripts
+                  readOnly: true
+          volumes:
+            - name: k6-scripts
+              configMap:
+                name: k6-test-script

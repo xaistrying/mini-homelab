@@ -1,0 +1,4 @@
+apiVersion: v2
+name: k6-lab
+description: k6 load testing CronJob for Podinfo
+version: 0.1.0

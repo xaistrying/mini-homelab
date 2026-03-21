@@ -1,0 +1,41 @@
+# =============================================================================
+# K6 LOAD TESTING — Traffic Simulation for Podinfo
+# =============================================================================
+#
+# Purpose:
+#   Generate consistent, predictable traffic (10 RPS) against Podinfo
+#   to produce observable metrics, logs, and patterns on Grafana dashboards.
+#
+# How it works:
+#   - Runs as a Kubernetes CronJob every 10 minutes
+#   - Each run lasts 5 minutes with 10 Virtual Users (VUs)
+#   - Each VU sends ~1 request/sec → total ~10 RPS
+#   - Targets multiple Podinfo endpoints with weighted distribution
+#
+# Traffic pattern:
+#   70%  GET /          → pod info (main endpoint)
+#   15%  GET /healthz   → health check
+#   10%  GET /status/200 → normal response
+#    5%  GET /delay/1   → simulated slow response (1 second)
+#
+# =============================================================================
+
+k6:
+  image:
+    repository: grafana/k6
+    tag: "0.56.0"
+
+  schedule: "*/10 * * * *"    # Run every 10 minutes
+  duration: "5m"              # Each run lasts 5 minutes
+  vus: 10                     # 10 Virtual Users → ~10 RPS
+
+  target:
+    url: "http://podinfo-lab.lab:9898"
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
