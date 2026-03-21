@@ -1,0 +1,25 @@
+{{- if .Values.apps.k6.enabled -}}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Values.apps.k6.metadata.name }}
+  namespace: {{ .Values.namespace | default "argocd" }}
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: {{ .Values.apps.k6.spec.project }}
+  source:
+    repoURL: {{ .Values.apps.k6.spec.source.repoURL }}
+    path: {{ .Values.apps.k6.spec.source.path }}
+    targetRevision: {{ .Values.targetRevision | default "main" }}
+    helm:
+      valueFiles:
+        {{- range .Values.apps.k6.spec.source.helm.valueFiles }}
+        - {{ . }}
+        {{- end }}
+  destination:
+    server: {{ .Values.apps.k6.spec.destination.server }}
+    namespace: {{ .Values.apps.k6.spec.destination.namespace }}
+  syncPolicy:
+    {{- toYaml .Values.apps.k6.spec.syncPolicy | nindent 4 }}
+{{- end }}

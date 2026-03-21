@@ -85,3 +85,23 @@ apps:
           selfHeal: true
         syncOptions:
           - ServerSideApply=true
+
+  k6:
+    enabled: true
+    metadata:
+      name: k6-lab
+    spec:
+      project: addons
+      source:
+        repoURL: https://github.com/xaistrying/mini-homelab.git
+        path: kubernetes/addons/k6
+        helm:
+          valueFiles:
+            - values.yaml
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: lab
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
